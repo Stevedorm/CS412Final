@@ -1,12 +1,11 @@
-import itertools
 """
     name:  Daniel Holtschneider
 
     Honor Code and Acknowledgments:
 
-            This work complies with the JMU Honor Code.
+        This work complies with the JMU Honor Code.
 
-           Comments here on your code and submission.
+        Comments here on your code and submission.
 """
 import itertools
 

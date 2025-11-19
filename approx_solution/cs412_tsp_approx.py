@@ -6,64 +6,64 @@
     Comments here on your code and submission
 """
 
-import itertools
+import random
+import time
 
- # All modules for CS 412 must include a main method that allows it
- # to imported and invoked from other python scripts
-def main ():
 
-    # EXAMPLE INPUT:
-    """
-    3 3
-    a b 3.0
-    b c 4.2
-    a c 5.4
-    
-    Solution is:
-    12.6000
-    a b c a
-    
-    Graph is undirected
-    """
-    # Store a dict of all nodes and weights, then 
-    # to make greedy choices here should we start by going to the next node with the lowest weight
-    # then continue on advoiding any nodes we have already visited
-    
-    # For the randomness aspect refer to the pictures I've taken earlier
-    # basically due it being a complete graph if we have five options with weights of 10, 20, 30, 40, 50
-    # total = 150, so 10/150 + 20/150 + 30/150 + 40/150 + 50/150 = 1
-    # have randomness based off the odds but reverse the above fractions turning 10/150 into the highest chance
-    # as thats the "usual" greediest pick
-    
-    # Gets the results from the input function; # of Vertixs & Nodes, then a list of both edges and nodes
-    V, E, edges, nodes = read_graph_from_stdin();
 
-    # from this now apply the greedy strategy to get the approx runtime 
+def main():
+    # Read graph
+    V, E, edges, nodes = read_graph_from_stdin()
 
-    # your code here
-    pass
+    # Map node labels → indices 0..V-1
+    nodes = sorted(list(nodes))
+    idx = {nodes[i]: i for i in range(V)}
 
-# chat generated function that reads from stdin and returns the number of vertices and nodes
-# as well as a list of nodes and edges
+    # Build full distance matrix (initialize with infinities)
+    dist = [[float('inf')] * V for _ in range(V)]
+
+    # Distance from node to itself = 0
+    for i in range(V):
+        dist[i][i] = 0.0
+
+    # Fill edges (undirected)
+    for u, v, w in edges:
+        ui = idx[u]
+        vi = idx[v]
+        dist[ui][vi] = w
+        dist[vi][ui] = w
+
+    # Run approximation algorithm
+    tour, cost = stochastic_greedy_tsp(dist)
+
+    # Convert indices back to node labels & print final cycle
+    tour_labels = [nodes[i] for i in tour]
+    # Return to start node:
+    tour_labels.append(tour_labels[0])
+
+    # Output format required:
+    print(f"{cost:.4f}")
+    print(" ".join(tour_labels))
+
+
+
 def read_graph_from_stdin():
-    import sys
+    # Read the first line: V E
+    first = input().strip()
+    if not first:
+        raise ValueError("Missing graph size line (expected: V E).")
 
-    data = sys.stdin.read().strip().splitlines()
-    if not data:
-        raise ValueError("Empty input!")
-
-    # Parse first line: V E
-    header = data[0].split()
-    if len(header) < 2:
-        raise ValueError("First line must contain: <num_vertices> <num_edges>")
-    V = int(header[0])
-    E = int(header[1])
+    V, E = map(int, first.split())
 
     edges = []
     nodes = set()
 
-    # Parse edges
-    for line in data[1:1+E]:
+    # Read exactly E edge lines
+    for _ in range(E):
+        line = input().strip()
+        if not line:
+            raise ValueError("Missing or empty edge line.")
+
         u, v, w = line.split()
         w = float(w)
 
@@ -73,5 +73,62 @@ def read_graph_from_stdin():
 
     return V, E, edges, nodes
 
-if __name__ == " __main__ " :
-    main ()
+
+
+
+def stochastic_greedy_tsp(dist, runtime_limit=None):
+    """Stochastic nearest-neighbor with inverse-distance weighting.
+       Runtime: O(n^2). Works for n > 1000.
+    """
+    n = len(dist)
+    best_tour = None
+    best_cost = float('inf')
+
+    start_time = time.time()
+    while True:
+        if runtime_limit and time.time() - start_time > runtime_limit:
+            break
+
+        visited = [False] * n
+        start = random.randrange(n)
+        tour = [start]
+        visited[start] = True
+        cost = 0.0
+        current = start
+
+        for _ in range(n - 1):
+            candidates = []
+            weights = []
+
+            for v in range(n):
+                if not visited[v]:
+                    d = dist[current][v]
+                    # Inverse-distance weighting encourages greedy behavior
+                    w = 1.0 / (d + 1e-12)
+                    candidates.append(v)
+                    weights.append(w)
+
+            next_city = random.choices(candidates, weights=weights)[0]
+            visited[next_city] = True
+            tour.append(next_city)
+            cost += dist[current][next_city]
+            current = next_city
+
+        # Close the tour
+        cost += dist[current][start]
+
+        if cost < best_cost:
+            best_cost = cost
+            best_tour = tour
+
+        # If no anytime limit, only run once
+        if not runtime_limit:
+            break
+
+    return best_tour, best_cost
+
+
+
+# FIXED: remove extra spaces
+if __name__ == "__main__":
+    main()

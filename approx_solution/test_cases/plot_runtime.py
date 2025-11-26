@@ -9,7 +9,7 @@ Assumes CSV format:
     test_case,input_size,runtime_seconds
 
 TO RUN PLOT_RUNTIME:
-    You need to update the top line with the path to the virtual environment. 
+    You need to update the top line with the path to the virtual environment.
     For me, I ran this in the terminal:
         which python (on bash)
         the copied that path to the top line, then I was able to run it normally

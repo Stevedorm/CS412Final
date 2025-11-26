@@ -42,8 +42,12 @@ def main():
     tour_labels.append(tour_labels[0])
 
     # Output format required:
-    print(f"{cost:.4f}")
-    print(" ".join(tour_labels))
+    # Steve - changed this to match format from imported tests
+    # Out puts are not the same, but it shouldn't be, right?
+    print(f"Minimum cost: {cost:.4f}")   # 4 decimals
+    print("Minimum path:", tour_labels)
+    # print(f"{cost:.4f}")
+    # print(" ".join(tour_labels))
 
 
 

@@ -76,7 +76,8 @@ for infile in "$INPUT_DIR"/*.in; do
   fi
 
     # Extract input size from the first line of the .in file.
-  input_size="$(head -n 1 "$infile" | tr -d '[:space:]')"
+  input_size="$(head -n 1 "$infile" | awk '{print $1}')"
+
 
   # Reset and start the timer
   SECONDS=0

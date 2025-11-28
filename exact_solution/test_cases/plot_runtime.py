@@ -51,8 +51,8 @@ for x, y, label in zip(input_sizes, runtimes, labels):
         (x, y),
         textcoords="offset points",
         xytext=(10, 6),   # offset diagonally
-        ha="left",
-        rotation=30,
+        ha="right",
+        rotation=-20,
         fontsize=8
     )
 

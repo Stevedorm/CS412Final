@@ -1,2 +1,2 @@
-Minimum cost: 22.0000
-Minimum path: ['F', 'D', 'B', 'C', 'A', 'E', 'G', 'F']
+Minimum cost: 18.0000
+Minimum path: ['A', 'B', 'D', 'F', 'E', 'G', 'C', 'A']

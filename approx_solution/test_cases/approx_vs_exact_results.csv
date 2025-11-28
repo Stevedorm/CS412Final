@@ -1,0 +1,14 @@
+test_case,input_size,exact_runtime,approx_runtime,exact_cost,approx_cost
+tc01_two_vertices,2,0,0,6.0000,6.0000
+tc02_triangle_easy,3,0,0,12.0000,12.0000
+tc03_triangle_decimals,3,0,0,7.0368,7.0368
+tc04_square_cycle,4,0,1,4.0000,4.0000
+tc05_square_use_diagonals,4,0,1,5.0000,5.0000
+tc06_labels_nonalpha,4,0,1,14.0000,14.0000
+tc07_five_vertices,5,0,1,11.0000,15.0000
+tc08_medium_7nodes,7,0,1,14.0000,20.0000
+tc09_slow_8nodes,8,0,0,22.0000,38.0000
+tc10_very_slow_9nodes,9,1,1,27.0000,37.0000
+tc11_intermediate_10nodes,11,88,1,31.0000,47.0000
+tc12_intermediate_11nodes,11,108,1,31.0000,50.0000
+tc13_slow_12nodes,12,1204,1,24.0000,44.0000

@@ -9,6 +9,16 @@
 import random
 import time
 
+"""
+Example TSP Input
+3 3
+a b 3.0
+b c 4.2
+a c 5.4
+
+Next goal forward is to add a timer 
+
+"""
 
 
 def main():
@@ -48,7 +58,7 @@ def main():
 
 
 def read_graph_from_stdin():
-    # Read the first line: V E
+    
     first = input().strip()
     if not first:
         raise ValueError("Missing graph size line (expected: V E).")
@@ -58,7 +68,6 @@ def read_graph_from_stdin():
     edges = []
     nodes = set()
 
-    # Read exactly E edge lines
     for _ in range(E):
         line = input().strip()
         if not line:

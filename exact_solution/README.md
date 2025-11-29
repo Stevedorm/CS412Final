@@ -1,4 +1,4 @@
-To run the tests, you must CD into the testcases folder and execute run_test_cases.sh.
+<pre>To run the tests, you must CD into the testcases folder and execute run_test_cases.sh.
 
 This MUST be done in Git Bash or something similar, or else the tests wont execute.
 
@@ -10,3 +10,4 @@ TO RUN PLOT_RUNTIME:
     the terminal:
         which python (on bash)
         the copied that path to the top line, then I was able to run it normally
+</pre>

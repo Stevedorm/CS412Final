@@ -8,6 +8,6 @@ In the output folder, the outputs are stored in .actual files (the actual input)
 
 TO RUN PLOT_RUNTIME:
     You need to update the top line with the path to the virtual environment. For me, I ran this in
-    the terminal:
-        which python (on bash)
+    the terminal:<br>
+        which python (on bash)<br>
         the copied that path to the top line, then I was able to run it normally

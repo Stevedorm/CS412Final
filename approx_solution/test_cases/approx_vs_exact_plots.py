@@ -53,6 +53,28 @@ plt.figure(figsize=(8, 5))
 plt.plot(input_sizes, exact_runtimes, marker="o", label="Exact runtime")
 plt.plot(input_sizes, approx_runtimes, marker="o", label="Approx runtime")
 
+# Annotate the EXACT runtime points only
+for x, rt, name in zip(input_sizes, exact_runtimes, test_cases):
+    if x >= 12:
+        plt.annotate(
+            name,
+            (x, rt),
+            textcoords="offset points",
+            xytext=(-5, 5),
+            fontsize=8,
+            ha="right"
+        )
+    elif x >= 10:
+        plt.annotate(
+            name,
+            (x, rt),
+            textcoords="offset points",
+            xytext=(-5, 5),
+            fontsize=8,
+            ha="right",
+            rotation=-25
+        )
+
 plt.xlabel("Input size (number of cities)")
 plt.ylabel("Runtime (seconds)")
 plt.title("Exact vs Approx Runtime")
@@ -69,8 +91,12 @@ plt.plot(input_sizes, approx_costs, marker="o", label="Approx cost")
 # Optionally annotate each point with test_case name
 for x, ec, ac, name in zip(input_sizes, exact_costs, approx_costs, test_cases):
     # Only label bigger instances to avoid clutter, tweak as needed
-    if x >= 5:
-        plt.annotate(name, (x, ac), textcoords="offset points", xytext=(5, 5), fontsize=8)
+    if x >= 5 and x < 10 or x > 10:
+        plt.annotate(name, (x, ac), textcoords="offset points", xytext=(5, 5), fontsize=8, ha="right")
+        # rotation=-25)
+    elif x == 10:
+        plt.annotate(name, (x, ac), textcoords="offset points", xytext=(5, 5), fontsize=8, ha="center")
+
 
 plt.xlabel("Input size (number of cities)")
 plt.ylabel("Tour cost")

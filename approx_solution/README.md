@@ -1,4 +1,4 @@
-To run the tests, you must CD into the testcases folder and execute run_test_cases.sh or the respective shell file. compute_approx_wallclock.sh compares
+<pre>To run the tests, you must CD into the testcases folder and execute run_test_cases.sh or the respective shell file. compute_approx_wallclock.sh compares
 the exact solution and the approximate solution.
 
 This MUST be done in Git Bash or something similar, or else the tests wont execute.
@@ -11,3 +11,4 @@ TO RUN PLOT_RUNTIME:
     the terminal:<br>
         which python (on bash)<br>
         the copied that path to the top line, then I was able to run it normally
+</pre>

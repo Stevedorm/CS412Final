@@ -44,7 +44,7 @@ def main():
         dist[vi][ui] = w
 
     # Run approximation algorithm
-    tour, cost = stochastic_greedy_tsp(dist)
+    tour, cost = approx_tsp(dist, runtime_limit=None)
 
     # Convert indices back to node labels & print final cycle
     tour_labels = [nodes[i] for i in tour]
@@ -52,12 +52,8 @@ def main():
     tour_labels.append(tour_labels[0])
 
     # Output format required:
-    # Steve - changed this to match format from imported tests
-    # Out puts are not the same, but it shouldn't be, right?
-    print(f"Minimum cost: {cost:.4f}")   # 4 decimals
-    print("Minimum path:", tour_labels)
-    # print(f"{cost:.4f}")
-    # print(" ".join(tour_labels))
+    print(f"{cost:.4f}")
+    print(" ".join(tour_labels))
 
 
 
@@ -87,58 +83,103 @@ def read_graph_from_stdin():
     return V, E, edges, nodes
 
 
+import time
+
+def tour_cost(tour, dist):
+    """Compute cost of a tour (cycle)."""
+    n = len(tour)
+    total = 0.0
+    for i in range(n):
+        u = tour[i]
+        v = tour[(i + 1) % n]
+        total += dist[u][v]
+    return total
 
 
-def stochastic_greedy_tsp(dist, runtime_limit=None):
-    """Stochastic nearest-neighbor with inverse-distance weighting.
-       Runtime: O(n^2). Works for n > 1000.
-    """
+def greedy_tour(dist, start=0):
+    """Nearest-neighbor tour starting at `start`. O(n^2)."""
     n = len(dist)
-    best_tour = None
-    best_cost = float('inf')
+    visited = [False] * n
+    tour = [start]
+    visited[start] = True
+    current = start
 
+    for _ in range(n - 1):
+        best_v = None
+        best_d = float("inf")
+        row = dist[current]
+        for v in range(n):
+            if not visited[v]:
+                d = row[v]
+                if d < best_d:
+                    best_d = d
+                    best_v = v
+        visited[best_v] = True
+        tour.append(best_v)
+        current = best_v
+
+    return tour
+
+
+def two_opt(tour, dist, runtime_limit=None, start_time=None):
+    """
+    2-opt local search. Improves a tour by reversing segments.
+    First-improvement strategy, stops when no improvement or time limit.
+    """
+    if start_time is None:
+        start_time = time.time()
+
+    n = len(tour)
+    improved = True
+
+    while improved:
+        improved = False
+        # we keep the start fixed at index 0 to avoid equivalent rotations
+        for i in range(1, n - 2):
+            a = tour[i - 1]
+            b = tour[i]
+            for j in range(i + 1, n - 1):
+                if runtime_limit and time.time() - start_time > runtime_limit:
+                    return tour
+
+                c = tour[j]
+                d = tour[(j + 1) % n]
+
+                # Cost delta if we reverse segment [i..j]
+                old_cost = dist[a][b] + dist[c][d]
+                new_cost = dist[a][c] + dist[b][d]
+
+                if new_cost + 1e-12 < old_cost:
+                    # Apply the 2-opt move
+                    tour[i:j+1] = reversed(tour[i:j+1])
+                    improved = True
+                    break  # restart search from scratch
+            if improved:
+                break
+
+    return tour
+
+
+def approx_tsp(dist, runtime_limit=None):
+    """
+    Greedy + 2-opt TSP heuristic.
+    - Build a nearest-neighbor tour.
+    - Improve with 2-opt until no better move or time limit.
+    """
     start_time = time.time()
-    while True:
-        if runtime_limit and time.time() - start_time > runtime_limit:
-            break
 
-        visited = [False] * n
-        start = random.randrange(n)
-        tour = [start]
-        visited[start] = True
-        cost = 0.0
-        current = start
+    # 1) greedy starting at node 0 (could randomize if you want)
+    tour = greedy_tour(dist, start=0)
 
-        for _ in range(n - 1):
-            candidates = []
-            weights = []
+    # 2) local improvement
+    remaining = None
+    if runtime_limit is not None:
+        remaining = max(0.0, runtime_limit - (time.time() - start_time))
 
-            for v in range(n):
-                if not visited[v]:
-                    d = dist[current][v]
-                    # Inverse-distance weighting encourages greedy behavior
-                    w = 1.0 / (d + 1e-12)
-                    candidates.append(v)
-                    weights.append(w)
+    tour = two_opt(tour, dist, runtime_limit=remaining, start_time=start_time)
+    cost = tour_cost(tour, dist)
+    return tour, cost
 
-            next_city = random.choices(candidates, weights=weights)[0]
-            visited[next_city] = True
-            tour.append(next_city)
-            cost += dist[current][next_city]
-            current = next_city
-
-        # Close the tour
-        cost += dist[current][start]
-
-        if cost < best_cost:
-            best_cost = cost
-            best_tour = tour
-
-        # If no anytime limit, only run once
-        if not runtime_limit:
-            break
-
-    return best_tour, best_cost
 
 
 

@@ -32,7 +32,7 @@ def main():
         labels.add(u)
         labels.add(v)
 
-    # Map labels → indices 0..n-1 based on the labels that actually appear
+    # Map labels → indices 0..n-1 based on actual labels
     nodes = sorted(labels)
     n = len(nodes)
     label_to_index = {nodes[i]: i for i in range(n)}
@@ -43,7 +43,7 @@ def main():
     for i in range(n):
         mat[i][i] = 0.0
 
-    # Fill in edges
+    # Fill edges (undirected)
     for u, v, w in raw_edges:
         ui = label_to_index[u]
         vi = label_to_index[v]
@@ -51,8 +51,8 @@ def main():
 
     vertices = list(range(n))
 
-    min_cost = float("inf")
-    min_path = None
+    best_cost = float("inf")
+    best_perm = None
 
         # BRUTE-FORCE TSP
     # TIME COMPLEXITY: O(n! * n)
@@ -63,31 +63,30 @@ def main():
     for perm in itertools.permutations(vertices):
         cost = 0.0
         valid = True
-        for i in range(n): # n edges in the tour
-            u = perm[i] #all constant time operations in loop
+        for i in range(n):
+            u = perm[i]
             v = perm[(i + 1) % n]  # wrap around to start
             w = mat[u][v]
             if w == INF:
                 valid = False
                 break
             cost += w
-        if valid and cost < min_cost:
-            min_cost = cost
-            min_path = perm
+        if valid and cost < best_cost:
+            best_cost = cost
+            best_perm = perm
 
-    # We assume test graphs have at least one Hamiltonian cycle
-    # so min_path should not be None here.
-    if min_path is None:
-        # If this ever happens, something is seriously wrong with the input or assumptions.
-        min_cost = 0.0
-        min_path = (0,)
+    # We assume tests for exact TSP have a Hamiltonian cycle
+    if best_perm is None:
+        # No tour – fall back to something non-crashy
+        best_cost = 0.0
+        best_perm = (0,)
 
-    # convert path indices back to labels
+    # Convert back to labels
     index_to_label = {i: lbl for i, lbl in enumerate(nodes)}
-    readable_path = [index_to_label[i] for i in min_path]
-    readable_path.append(readable_path[0])   # repeat start at end
+    readable_path = [index_to_label[i] for i in best_perm]
+    readable_path.append(readable_path[0])
 
-    print(f"{min_cost:.4f}")   # 4 decimals
+    print(f"{best_cost:.4f}")
     print(" ".join(readable_path))
 
 

@@ -1,9 +1,10 @@
 """
-    name : Your name ( s ) here
+    Name : Steve Dormady
 
     Honor Code and Acknowledgments :
-    This work complies with the JMU Honor Code .
-    Comments here on your code and submission
+    
+        This work complies with the JMU Honor Code .
+        Comments here on your code and submission
 """
 
 import time

@@ -23,3 +23,5 @@ tc11_intermediate_10nodes,10,7
 tc11_intermediate_10nodes,10,7
 tc12_intermediate_11nodes,11,74
 tc12_intermediate_11nodes,11,74
+tc13_slow_12nodes,12,1077
+tc13_slow_12nodes,12,1077

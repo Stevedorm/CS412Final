@@ -63,8 +63,8 @@ def main():
     for perm in itertools.permutations(vertices):
         cost = 0.0
         valid = True
-        for i in range(n):
-            u = perm[i]
+        for i in range(n): # n edges in the tour
+            u = perm[i] #all constant time operations in loop
             v = perm[(i + 1) % n]  # wrap around to start
             w = mat[u][v]
             if w == INF:

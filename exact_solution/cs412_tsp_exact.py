@@ -7,77 +7,80 @@
 
         Comments here on your code and submission.
 """
+import sys
 import itertools
 
 
 def main():
-    n, m = map(int, input().strip().split())
+    first = sys.stdin.readline().strip()
+    if not first:
+        return
+
+    declared_n, m = map(int, first.split())
+
+    raw_edges = []
+    labels = set()
+
+    # Read all edges, collect labels
+    for _ in range(m):
+        line = sys.stdin.readline().strip()
+        if not line:
+            continue
+        u, v, w = line.split()
+        w = float(w)
+        raw_edges.append((u, v, w))
+        labels.add(u)
+        labels.add(v)
+
+    # Map labels → indices 0..n-1 based on the labels that actually appear
+    nodes = sorted(labels)
+    n = len(nodes)
+    label_to_index = {nodes[i]: i for i in range(n)}
+
+    # Build adjacency matrix with INF for missing edges
     INF = float("inf")
     mat = [[INF] * n for _ in range(n)]
+    for i in range(n):
+        mat[i][i] = 0.0
 
-    # map vertex labels (letters) → integer indices
-    label_to_index = {}
-    current_index = 0
-
-    def get_index(label):
-        nonlocal current_index
-        if label not in label_to_index:
-            label_to_index[label] = current_index
-            current_index += 1
-        return label_to_index[label]
-
-    # read edges
-    for _ in range(m):
-        u, v, w = input().strip().split()
-        ui = get_index(u)       # convert label → index
-        vi = get_index(v)       # convert label → index
-        w = float(w)            # weight can be a double
+    # Fill in edges
+    for u, v, w in raw_edges:
+        ui = label_to_index[u]
+        vi = label_to_index[v]
         add_edge(mat, ui, vi, w)
 
     vertices = list(range(n))
 
-    min_cost = INF
-    min_path = None  # None means "no tour found yet"
+    min_cost = float("inf")
+    min_path = None
 
-    # brute-force TSP
+    # brute-force TSP over all permutations of 0..n-1
     for perm in itertools.permutations(vertices):
         cost = 0.0
         valid = True
-
         for i in range(n):
             u = perm[i]
-            v = perm[(i + 1) % n]
+            v = perm[(i + 1) % n]  # wrap around to start
             w = mat[u][v]
             if w == INF:
                 valid = False
-                break  # this tour uses a missing edge, skip it
+                break
             cost += w
-
         if valid and cost < min_cost:
             min_cost = cost
             min_path = perm
 
-    # If no Hamiltonian cycle exists, avoid crashing
+    # We assume test graphs have at least one Hamiltonian cycle
+    # so min_path should not be None here.
     if min_path is None:
-        # Fallback: pick some existing vertex if we have any labels
-        if label_to_index:
-            # take the first index we assigned
-            start_index = next(iter(label_to_index.values()))
-            min_path = (start_index,)
-            # there is no tour, so cost is 0 or whatever convention you prefer
-            min_cost = 0.0
-        else:
-            # truly degenerate case (no labels/edges)
-            min_path = ()
-            min_cost = 0.0
+        # If this ever happens, something is seriously wrong with the input or assumptions.
+        min_cost = 0.0
+        min_path = (0,)
 
     # convert path indices back to labels
-    index_to_label = {v: k for k, v in label_to_index.items()}
-    readable_path = [index_to_label[i] for i in min_path] if min_path else []
-
-    # repeat start at end if we have at least one vertex
-    if readable_path:
-        readable_path.append(readable_path[0])
+    index_to_label = {i: lbl for i, lbl in enumerate(nodes)}
+    readable_path = [index_to_label[i] for i in min_path]
+    readable_path.append(readable_path[0])   # repeat start at end
 
     print(f"{min_cost:.4f}")   # 4 decimals
     print(" ".join(readable_path))

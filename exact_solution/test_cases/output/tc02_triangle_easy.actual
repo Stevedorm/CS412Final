@@ -1,2 +1,2 @@
-12.0000
-a c b a
+Minimum cost: 12.0000
+Minimum path: ['a', 'b', 'c', 'a']

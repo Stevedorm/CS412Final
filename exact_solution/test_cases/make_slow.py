@@ -2,7 +2,7 @@
 import itertools
 
 # 13 cities: A .. M
-nodes = [chr(ord('A') + i) for i in range(13)]  # ['A', 'B', ..., 'M']
+nodes = [chr(ord('a') + i) for i in range(13)]  # ['A', 'B', ..., 'M']
 
 def weight(i, j):
     # Deterministic symmetric weights in [1, 10]

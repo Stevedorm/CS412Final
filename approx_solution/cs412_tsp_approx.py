@@ -28,6 +28,14 @@ Update code on here to make more readible and add more comments
 """
 
 
+import random
+import time
+import math
+
+# Strong OS randomness
+rng = random.SystemRandom()
+
+
 def main():
     # Read graph
     V, E, edges, nodes = read_graph_from_stdin()
@@ -36,57 +44,54 @@ def main():
     nodes = sorted(list(nodes))
     idx = {nodes[i]: i for i in range(V)}
 
-    # Build full distance matrix (initialize with infinities)
+    # Build distance matrix
     dist = [[float('inf')] * V for _ in range(V)]
-
-    # Distance from node to itself = 0
     for i in range(V):
         dist[i][i] = 0.0
-
-    # Fill edges (undirected)
     for u, v, w in edges:
         ui = idx[u]
         vi = idx[v]
         dist[ui][vi] = w
         dist[vi][ui] = w
 
-    # Run approximation algorithm    
-    # if V <= 8:
-    #     runtime_limit = None      # One fast greedy run
-    # elif V <= 12:
-    #     runtime_limit = 0.01      # 10 ms
-    # elif V <= 20:
-    #     runtime_limit = 0.05      # 50 ms
-    # else:
-    #     limit = .1 * math.log(V)
-    #     runtime_limit = min(limit, 1.5)
-        
-        
-    tour, cost = stochastic_greedy_tsp(dist)
+    # -------------------------
+    # MULTI-START STOCHASTIC GREEDY
+    # -------------------------
+    # Very fast + much more reliable than 1 run
+    if V <= 200:
+        K = 10
+    elif V <= 600:
+        K = 8
+    elif V <= 1000:
+        K = 4
+    else:
+        K = 3
 
-    # Convert indices back to node labels & print final cycle
-    tour_labels = [nodes[i] for i in tour]
-    # Return to start node:
+    best_cost = float('inf')
+    best_tour = None
+
+    for _ in range(K):
+        tour, cost = stochastic_greedy_tsp(dist)
+        if cost < best_cost:
+            best_cost = cost
+            best_tour = tour
+
+    # Convert back to labels
+    tour_labels = [nodes[i] for i in best_tour]
     tour_labels.append(tour_labels[0])
 
-    # Output format required:
-    # Steve - changed this to match format from imported tests
-    # Out puts are not the same, but it shouldn't be, right?
-    # print(f"Minimum cost: {cost:.4f}")   # 4 decimals
-    # print("Minimum path:", tour_labels)
-    print(f"{cost:.4f}")
+    print(f"{best_cost:.4f}")
     print(" ".join(tour_labels))
 
 
 
 def read_graph_from_stdin():
-    
+
     first = input().strip()
     if not first:
         raise ValueError("Missing graph size line (expected: V E).")
 
     V, E = map(int, first.split())
-
     edges = []
     nodes = set()
 
@@ -97,7 +102,6 @@ def read_graph_from_stdin():
 
         u, v, w = line.split()
         w = float(w)
-
         edges.append((u, v, w))
         nodes.add(u)
         nodes.add(v)
@@ -106,80 +110,56 @@ def read_graph_from_stdin():
 
 
 
-def stochastic_greedy_tsp(dist, runtime_limit=None):
+def stochastic_greedy_tsp(dist):
     """
-    Stochastic nearest-neighbor TSP heuristic.
-    Assumes:
-      - Complete graph
-      - Undirected (dist[u][v] == dist[v][u])
-    Runtime: O(n^2)
-    Supports anytime mode via runtime_limit.
+    Single stochastic greedy TSP run.
+    Much faster now; no runtime_limit.
     """
     n = len(dist)
-    best_tour = None
-    best_cost = float('inf')
+    visited = [False] * n
 
-    start_time = time.time()
+    start = rng.randrange(n)
+    current = start
+    tour = [start]
+    visited[start] = True
+    cost = 0.0
 
-    while True:
-        # Anytime exit condition
-        if runtime_limit and (time.time() - start_time) > runtime_limit:
-            break
+    for _ in range(n - 1):
+        candidates = []
+        weights = []
 
-        visited = [False] * n
-        start = random.randrange(n)
-        current = start
+        for v in range(n):
+            if not visited[v]:
+                d = dist[current][v]
+                w = 1.0 / (d + 1e-12)
+                candidates.append(v)
+                weights.append(w)
 
-        tour = [start]
-        visited[start] = True
-        cost = 0.0
+        next_city = weighted_random_choice(candidates, weights)
 
-        for _ in range(n - 1):
-            candidates = []
-            weights = []
+        visited[next_city] = True
+        tour.append(next_city)
+        cost += dist[current][next_city]
+        current = next_city
 
-            # Since the graph is complete, every unvisited vertex is reachable.
-            for v in range(n):
-                if not visited[v]:
-                    d = dist[current][v]
-                    # inverse-distance weighting (greedy but stochastic)
-                    w = 1.0 / (d + 1e-12)
-                    candidates.append(v)
-                    weights.append(w)
+    # Close cycle
+    cost += dist[current][start]
 
-            # stochastic weighted greedy choice
-            next_city = weighted_random_choice(candidates, weights)
+    return tour, cost
 
-            visited[next_city] = True
-            tour.append(next_city)
-
-            cost += dist[current][next_city]
-            current = next_city
-
-        # close the Hamiltonian cycle
-        cost += dist[current][start]
-
-        if cost < best_cost:
-            best_cost = cost
-            best_tour = tour
-
-        # No time limit? Single run.
-        if runtime_limit is None:
-            break
-
-    return best_tour, best_cost
 
 
 def weighted_random_choice(values, weights):
-    """Pick one element from values using weights in O(n) time."""
-    total = sum(weights)  # O(n)
-    r = random.random() * total
+    """
+    Strong randomness + weighted O(n) choice.
+    """
+    total = sum(weights)
+    r = rng.random() * total
     s = 0
-    for v, w in zip(values, weights):  # O(n)
+    for v, w in zip(values, weights):
         s += w
         if s >= r:
             return v
-
 
 # FIXED: remove extra spaces
 if __name__ == "__main__":

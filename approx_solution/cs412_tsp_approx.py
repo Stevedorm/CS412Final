@@ -49,8 +49,17 @@ def main():
         dist[ui][vi] = w
         dist[vi][ui] = w
 
-    # Run approximation algorithm
-    tour, cost = stochastic_greedy_tsp(dist)
+    # Run approximation algorithm    
+    if V <= 8:
+        runtime_limit = None      # One fast greedy run
+    elif V <= 12:
+        runtime_limit = 0.01      # 10 ms
+    elif V <= 20:
+        runtime_limit = 0.05      # 50 ms
+    else:
+        runtime_limit = 0.2       # 200 ms
+        
+    tour, cost = stochastic_greedy_tsp(dist, runtime_limit)
 
     # Convert indices back to node labels & print final cycle
     tour_labels = [nodes[i] for i in tour]
@@ -60,10 +69,10 @@ def main():
     # Output format required:
     # Steve - changed this to match format from imported tests
     # Out puts are not the same, but it shouldn't be, right?
-    print(f"Minimum cost: {cost:.4f}")   # 4 decimals
-    print("Minimum path:", tour_labels)
-    # print(f"{cost:.4f}")
-    # print(" ".join(tour_labels))
+    # print(f"Minimum cost: {cost:.4f}")   # 4 decimals
+    # print("Minimum path:", tour_labels)
+    print(f"{cost:.4f}")
+    print(" ".join(tour_labels))
 
 
 

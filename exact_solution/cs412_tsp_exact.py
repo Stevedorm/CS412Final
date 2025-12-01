@@ -54,12 +54,17 @@ def main():
     min_cost = float("inf")
     min_path = None
 
-    # brute-force TSP over all permutations of 0..n-1
+        # BRUTE-FORCE TSP
+    # TIME COMPLEXITY: O(n! * n)
+    # - itertools.permutations(vertices): generates all n! permutations
+    # - Inner loop (for i in range(n)): calculates cost of each n-node tour
+    # - Each edge lookup mat[u][v]: O(1) constant time
+    # DOMINANT TERM: The n! permutations dominate; for n=13, this is ~6.2 billion operations
     for perm in itertools.permutations(vertices):
         cost = 0.0
         valid = True
-        for i in range(n):
-            u = perm[i]
+        for i in range(n): # n edges in the tour
+            u = perm[i] #all constant time operations in loop
             v = perm[(i + 1) % n]  # wrap around to start
             w = mat[u][v]
             if w == INF:

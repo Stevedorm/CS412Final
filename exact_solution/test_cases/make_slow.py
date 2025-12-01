@@ -8,7 +8,7 @@ def generate_city_names(count):
     name_list = []
     
     # Generate names of increasing length
-    length = 2
+    length = 4
     while len(name_list) < count:
         for tup in itertools.product(letters, repeat=length):
             name_list.append("".join(tup))
@@ -23,9 +23,9 @@ def weight(i, j):
     return float(((i + 1) * (j + 3)) % 10 + 1)
 
 # Generate 1000 cities
-nodes = generate_city_names(1000)
+nodes = generate_city_names(2000)
 
-filename = "tc1000_super_slow.in"
+filename = "tc17_2000_super_duper_slow.in"
 
 with open(filename, "w") as f:
     n = len(nodes)

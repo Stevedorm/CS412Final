@@ -113,7 +113,6 @@ def read_graph_from_stdin():
 def stochastic_greedy_tsp(dist):
     """
     Single stochastic greedy TSP run.
-    Much faster now; no runtime_limit.
     """
     n = len(dist)
     visited = [False] * n

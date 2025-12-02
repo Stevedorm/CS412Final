@@ -181,8 +181,5 @@ def approx_tsp(dist, runtime_limit=None):
     return tour, cost
 
 
-
-
-# FIXED: remove extra spaces
 if __name__ == "__main__":
     main()

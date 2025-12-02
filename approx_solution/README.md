@@ -1,5 +1,7 @@
-<pre>To run the tests, you must CD into the testcases folder and execute run_test_cases.sh or the respective shell file. compute_approx_wallclock.sh compares
-the exact solution and the approximate solution.
+<pre>
+There are some additional shell files, python scripts, csv's, and images in this directory. These are mainly for plotting the data from locally testing into a nice, displayable format.
+The a_a png files are comparing the cost and runtimes of the approximate and augmented solutions to the TSP problem. The a_e png files show the dta from the approximate and exact solutions
+To run the tests, you must CD into the testcases folder and execute run_test_cases.sh or the respective shell file. compute_approx_wallclock.sh compares the exact solution and the approximate solution.
 
 This MUST be done in Git Bash or something similar, or else the tests wont execute.
 

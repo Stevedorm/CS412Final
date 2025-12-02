@@ -18,6 +18,7 @@ and produces two plots:
 
 import csv
 import matplotlib
+
 # Use non-interactive backend so this works on headless setups too
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -43,10 +44,21 @@ with open(CSV_FILE, newline="") as f:
         approx_costs.append(float(row["approx_cost"]))
 
 # Sort by input size so the lines don't zig-zag
-data = list(zip(input_sizes, test_cases, exact_runtimes, approx_runtimes, exact_costs, approx_costs))
+data = list(
+    zip(
+        input_sizes,
+        test_cases,
+        exact_runtimes,
+        approx_runtimes,
+        exact_costs,
+        approx_costs,
+    )
+)
 data.sort(key=lambda x: x[0])
 
-input_sizes, test_cases, exact_runtimes, approx_runtimes, exact_costs, approx_costs = zip(*data)
+input_sizes, test_cases, exact_runtimes, approx_runtimes, exact_costs, approx_costs = zip(
+    *data
+)
 
 # ---------- Plot 1: Runtime comparison ----------
 plt.figure(figsize=(8, 5))
@@ -62,7 +74,7 @@ for x, rt, name in zip(input_sizes, exact_runtimes, test_cases):
             textcoords="offset points",
             xytext=(-5, 5),
             fontsize=8,
-            ha="right"
+            ha="right",
         )
     elif x >= 10:
         plt.annotate(
@@ -72,7 +84,7 @@ for x, rt, name in zip(input_sizes, exact_runtimes, test_cases):
             xytext=(-5, 5),
             fontsize=8,
             ha="right",
-            rotation=-25
+            rotation=-25,
         )
 
 plt.xlabel("Input size (number of cities)")
@@ -81,7 +93,7 @@ plt.title("Exact vs Approx Runtime")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("runtime_comparison.png", dpi=200)
+plt.savefig("a_e_runtime_comparison.png", dpi=200)
 
 # ---------- Plot 2: Cost comparison ----------
 plt.figure(figsize=(8, 5))
@@ -91,12 +103,25 @@ plt.plot(input_sizes, approx_costs, marker="o", label="Approx cost")
 # Optionally annotate each point with test_case name
 for x, ec, ac, name in zip(input_sizes, exact_costs, approx_costs, test_cases):
     # Only label bigger instances to avoid clutter, tweak as needed
-    if x >= 5 and x < 10 or x > 10:
-        plt.annotate(name, (x, ac), textcoords="offset points", xytext=(5, 5), fontsize=8, ha="right")
+    if (x >= 5 and x < 10) or x > 10:
+        plt.annotate(
+            name,
+            (x, ac),
+            textcoords="offset points",
+            xytext=(5, 5),
+            fontsize=8,
+            ha="right",
+        )
         # rotation=-25)
     elif x == 10:
-        plt.annotate(name, (x, ac), textcoords="offset points", xytext=(5, 5), fontsize=8, ha="center")
-
+        plt.annotate(
+            name,
+            (x, ac),
+            textcoords="offset points",
+            xytext=(5, 5),
+            fontsize=8,
+            ha="center",
+        )
 
 plt.xlabel("Input size (number of cities)")
 plt.ylabel("Tour cost")
@@ -104,6 +129,6 @@ plt.title("Exact vs Approx Solution Quality")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("cost_comparison.png", dpi=200)
+plt.savefig("a_e_cost_comparison.png", dpi=200)
 
-print("Saved runtime_comparison.png and cost_comparison.png")
+print("Saved a_e_runtime_comparison.png and a_e_cost_comparison.png")

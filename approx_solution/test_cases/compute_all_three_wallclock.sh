@@ -1,26 +1,25 @@
 #!/usr/bin/env bash
 #
-# compute_approx_wallclock.sh
+# compute_all_three_wallclock.sh
 #
-# Runs BOTH the exact and approximate TSP solvers on all test cases in input/
+# Runs exact, approx, and augmented (part E) TSP solvers on all test cases in input/
 # and writes a combined CSV with:
-#   test_case,input_size,exact_runtime,approx_runtime,exact_cost,approx_cost
-#
-# This CSV can be used to:
-#   - plot runtime (exact vs approx) vs input size
-#   - plot solution quality (exact vs approx) vs input size
+#   test_case,input_size,
+#   exact_runtime,approx_runtime,aug_runtime,
+#   exact_cost,approx_cost,aug_cost
 #
 set -euo pipefail
 
 # Directory containing this script: approx_solution/test_cases
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Paths to solvers (adjust if yours are named differently)
+# Paths to solvers
 EXACT_SOL="$SCRIPT_DIR/../../exact_solution/cs412_tsp_exact.py"
 APPROX_SOL="$SCRIPT_DIR/../cs412_tsp_approx.py"
+AUG_SOL="$SCRIPT_DIR/../cs412_tsp_approx_partE.py"
 
 INPUT_DIR="$SCRIPT_DIR/input"
-OUTPUT_CSV="$SCRIPT_DIR/approx_vs_exact_results.csv"
+OUTPUT_CSV="$SCRIPT_DIR/all_three_results.csv"
 
 if [[ ! -f "$EXACT_SOL" ]]; then
   echo "ERROR: Cannot find exact solver at $EXACT_SOL" >&2
@@ -32,19 +31,25 @@ if [[ ! -f "$APPROX_SOL" ]]; then
   exit 1
 fi
 
+if [[ ! -f "$AUG_SOL" ]]; then
+  echo "ERROR: Cannot find augmented solver at $AUG_SOL" >&2
+  exit 1
+fi
+
 if [[ ! -d "$INPUT_DIR" ]]; then
   echo "ERROR: Missing input/ directory at $INPUT_DIR" >&2
   exit 1
 fi
 
-echo "Exact solver:   $EXACT_SOL"
-echo "Approx solver:  $APPROX_SOL"
-echo "Input folder:   $INPUT_DIR"
-echo "Output CSV:     $OUTPUT_CSV"
+echo "Exact solver:     $EXACT_SOL"
+echo "Approx solver:    $APPROX_SOL"
+echo "Augmented solver: $AUG_SOL"
+echo "Input folder:     $INPUT_DIR"
+echo "Output CSV:       $OUTPUT_CSV"
 echo
 
 # Initialize CSV header
-echo "test_case,input_size,exact_runtime,approx_runtime,exact_cost,approx_cost" > "$OUTPUT_CSV"
+echo "test_case,input_size,exact_runtime,approx_runtime,aug_runtime,exact_cost,approx_cost,aug_cost" > "$OUTPUT_CSV"
 
 # Loop over all .in test cases
 for infile in "$INPUT_DIR"/*.in; do
@@ -59,21 +64,29 @@ for infile in "$INPUT_DIR"/*.in; do
   exact_output="$(python3 "$EXACT_SOL" < "$infile")"
   exact_runtime="$SECONDS"
 
-  # Extract exact cost from "Minimum cost: X" line
+  # Assume solver prints (at least) one numeric cost; take first token on first line
   exact_cost="$(printf '%s\n' "$exact_output" | awk '{print $1; exit}')"
+
   # ---- Approx solver ----
   SECONDS=0
   approx_output="$(python3 "$APPROX_SOL" < "$infile")"
   approx_runtime="$SECONDS"
 
-  # Extract approx cost from "Minimum cost: X" line
   approx_cost="$(printf '%s\n' "$approx_output" | awk '{print $1; exit}')"
 
-  # Append to CSV
-  echo "${base},${input_size},${exact_runtime},${approx_runtime},${exact_cost},${approx_cost}" >> "$OUTPUT_CSV"
+  # ---- Augmented solver (part E) ----
+  SECONDS=0
+  aug_output="$(python3 "$AUG_SOL" < "$infile")"
+  aug_runtime="$SECONDS"
 
-  echo "  exact:  time=${exact_runtime}s,  cost=${exact_cost}"
-  echo "  approx: time=${approx_runtime}s, cost=${approx_cost}"
+  aug_cost="$(printf '%s\n' "$aug_output" | awk '{print $1; exit}')"
+
+  # Append to CSV
+  echo "${base},${input_size},${exact_runtime},${approx_runtime},${aug_runtime},${exact_cost},${approx_cost},${aug_cost}" >> "$OUTPUT_CSV"
+
+  echo "  exact:     time=${exact_runtime}s, cost=${exact_cost}"
+  echo "  approx:    time=${approx_runtime}s, cost=${approx_cost}"
+  echo "  augmented: time=${aug_runtime}s,  cost=${aug_cost}"
   echo
 done
 

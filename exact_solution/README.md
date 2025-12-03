@@ -1,7 +1,13 @@
 <pre>
-Traveling Salesperson Problem is important because it success is vital to many organizations that do deliveries or logistics. For example a delivery service would be able to use this program to find the most efficient way for a driver to complete their route, or a public bus system might use this to compute the most efficient route to pick up passengers.
+Traveling Salesperson Problem is important because it success is vital to many organizations that do deliveries or logistics. 
+For example a delivery service would be able to use this program to find the most efficient way for a driver to complete their 
+route, or a public bus system might use this to compute the most efficient route to pick up passengers. The traveling salesman
+problem has been around for a long time, first being studied in the 1930's. Even with almost a century of study into this
+problem it still remains NP-Hard. Many applications may not use the optimal method but use an approximation because of it 
+better speed when running on bigger inputs.
     
-To run the tests, you must CD into the testcases folder and execute run_test_cases.sh. THESE TESTS, ESPECIALLY THE LATTER ONES, WILL TAKE A LONG TIME TO EXECUTE, OVER TWO HOURS IN TOTAL.
+To run the tests, you must CD into the testcases folder and execute run_test_cases.sh.
+THESE TESTS, ESPECIALLY THE LATTER ONES, WILL TAKE A LONG TIME TO EXECUTE, OVER TWO HOURS IN TOTAL.
 
 This MUST be done in Git Bash or something similar, or else the tests wont execute.
 

@@ -1,0 +1,26 @@
+MAIN:
+read V, E, edges
+build distance matrix dist
+choose K based on V
+best_cost ← infinity
+best_tour ← null
+repeat K times:
+    (tour, cost) ← STOCHASTIC_GREEDY(dist)
+    if cost < best_cost:
+        best_cost ← cost
+        best_tour ← tour
+convert best_tour indices to labels
+print best_cost and best_tour
+
+STOCHASTIC_GREEDY(dist):
+choose random start city s
+mark s visited
+tour ← [s], current ← s, cost ← 0
+while unvisited cities remain:
+    for each unvisited v compute weight[v] = 1 / dist[current][v]
+    next ← weighted-random-choice(weight)
+    add next to tour and mark visited
+    cost ← cost + dist[current][next]
+    current ← next
+cost ← cost + dist[current][s]
+return (tour, cost)

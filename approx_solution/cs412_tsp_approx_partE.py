@@ -95,6 +95,45 @@ def tour_cost(tour, dist):
         total += dist[u][v]
     return total
 
+def greedy_tour(dist, start=0):
+    """
+    Nearest-neighbor tour starting at `start`.
+
+    Runtime Notes:
+        Let n = number of cities (len(dist)).
+
+        - Outer loop runs (n - 1) times (we choose one new city each step) → O(n).
+        - In each iteration, we scan all n cities to find the nearest unvisited neighbor → O(n).
+        - Total runtime: O(n) * O(n) = O(n^2).
+    """
+    n = len(dist)  
+    visited = [False] * n  # O(n) to allocate and initialize the list, doesn't effect asymptotic runtime
+    tour = [start]         
+    visited[start] = True  
+    current = start        
+
+    # Outer loop: runs (n - 1) times → O(n)
+    for _ in range(n - 1):
+        best_v = None
+        best_d = float("inf")
+        row = dist[current]
+
+        # Inner loop: scan all vertices to find nearest unvisited neighbor → O(n)
+        for v in range(n):
+            if not visited[v]:          
+                d = row[v]
+                if d < best_d:
+                    best_d = d
+                    best_v = v
+        visited[best_v] = True
+        tour.append(best_v)
+        current = best_v
+    # Overall:
+    #   - Outer loop: O(n)
+    #   - Inner loop: O(n) per outer iteration
+    #   → Total: O(n^2)
+
+    return tour
 
 def greedy_tour(dist, start=0):
     """Nearest-neighbor tour starting at `start`. O(n^2)."""
@@ -125,38 +164,41 @@ def two_opt(tour, dist, runtime_limit=None, start_time=None):
     """
     2-opt local search. Improves a tour by reversing segments.
     First-improvement strategy, stops when no improvement or time limit.
+
+    Runtime Notes:
+        - Let n = number of cities.
+        - The nested (i, j) loops enumerate O(n^2) edge pairs.
+        - Each improving move reverses a tour segment in O(n) time.
+        - If R improving moves occur, total runtime is O(R * n^2).
+        - Worst-case 2-opt runtime is O(n^3), though typical performance is closer to O(n^2).
     """
     if start_time is None:
         start_time = time.time()
-
     n = len(tour)
     improved = True
-
     while improved:
         improved = False
-        # we keep the start fixed at index 0 to avoid equivalent rotations
+        # Outer loop over indices i → O(n)
         for i in range(1, n - 2):
             a = tour[i - 1]
             b = tour[i]
+            # Inner loop over indices j → O(n)
             for j in range(i + 1, n - 1):
-                if runtime_limit and time.time() - start_time > runtime_limit:
+                if runtime_limit is not None and time.time() - start_time > runtime_limit:
                     return tour
-            # does it start random?
                 c = tour[j]
                 d = tour[(j + 1) % n]
-
-                # Cost delta if we reverse segment [i..j]
+                # Cost change check — constant-time operations
                 old_cost = dist[a][b] + dist[c][d]
                 new_cost = dist[a][c] + dist[b][d]
-
+                # If reversing segment improves the tour
                 if new_cost + 1e-12 < old_cost:
-                    # Apply the 2-opt move
-                    tour[i:j+1] = reversed(tour[i:j+1])
+                    # Reversing tour[i : j+1] costs O(k), where k = j - i + 1 (worst-case O(n))
+                    tour[i : j + 1] = reversed(tour[i : j + 1])
                     improved = True
-                    break  # restart search from scratch
+                    break   # restart search from scratch (does not change asymptotic cost)
             if improved:
-                break
-
+                break   # break outer loop to restart from i = 1
     return tour
 
 

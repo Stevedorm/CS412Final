@@ -107,32 +107,29 @@ def greedy_tour(dist, start=0):
         ⇒ Total time: O(n) * O(n) = O(n^2)
     """
     n = len(dist)
-
     # O(n): allocate and initialize list of length n
     visited = [False] * n
-
-    tour = [start]        # O(1)
-    visited[start] = True # O(1)
-    current = start       # O(1)
+    tour = [start]        
+    visited[start] = True 
+    current = start       
 
     # Outer loop: selects the next city (n - 1) times → O(n)
     for _ in range(n - 1):
         best_v = None
         best_d = float("inf")
-        row = dist[current]   # O(1): a single row of the matrix
+        row = dist[current]
 
         # Inner loop: scan all cities to find nearest unvisited → O(n)
         for v in range(n):
-            if not visited[v]:    # O(1)
-                d = row[v]        # O(1)
-                if d < best_d:    # O(1)
+            if not visited[v]:    
+                d = row[v]        
+                if d < best_d:    
                     best_d = d
                     best_v = v
 
-        visited[best_v] = True   # O(1)
-        tour.append(best_v)      # amortized O(1)
-        current = best_v         # O(1)
-
+        visited[best_v] = True   
+        tour.append(best_v)
+        current = best_v
     # Overall: O(n^2) time, O(n) extra space
     return tour
 
@@ -148,38 +145,30 @@ def two_opt(tour, dist, runtime_limit=None, start_time=None):
         - The nested loops over (i, j) examine O(n^2) edge pairs.
         - For each improving move, we reverse a segment tour[i:j+1] in O(n) time.
         - Let R be the number of improving moves until no better 2-opt move exists.
-          In the worst case, R can be O(n).
+            In the worst case, R can be O(n).
         ⇒ Worst-case time: O(R * n^2) ≤ O(n^3)
         In practice, R is usually much smaller, and 2-opt behaves closer to O(n^2).
     """
     if start_time is None:
         start_time = time.time()
-
     n = len(tour)
     improved = True
-
     # Each iteration of this while-loop corresponds to at least one improving 2-opt move.
     while improved:
         improved = False
-
         # Outer loop: i ranges over positions in the tour → O(n)
         for i in range(1, n - 2):
             a = tour[i - 1]
             b = tour[i]
-
             # Inner loop: j ranges over positions after i → O(n)
             for j in range(i + 1, n - 1):
                 # Time limit check is O(1)
                 if runtime_limit is not None and time.time() - start_time > runtime_limit:
                     return tour
-
                 c = tour[j]
                 d = tour[(j + 1) % n]
-
-                # Cost delta computed in O(1) time
                 old_cost = dist[a][b] + dist[c][d]
                 new_cost = dist[a][c] + dist[b][d]
-
                 if new_cost + 1e-12 < old_cost:
                     # Apply the 2-opt move.
                     # Reversing a slice of length k costs O(k), worst-case O(n).
@@ -188,7 +177,6 @@ def two_opt(tour, dist, runtime_limit=None, start_time=None):
                     break  # restart search from scratch
             if improved:
                 break
-
     # Overall worst-case: O(n^3); typical performance often closer to O(n^2).
     return tour
 
@@ -216,10 +204,8 @@ def approx_tsp(dist, total_time=5.0):
     start_time = time.time()
     best_cost = float("inf")
     best_tour = None
-
     per_run_costs = []  # one cost per restart
     history = []        # (elapsed_time, best_cost_so_far)
-
     n = len(dist)
 
     # Multi-restart loop: number of iterations R is limited by total_time.
@@ -231,10 +217,8 @@ def approx_tsp(dist, total_time=5.0):
         remaining = total_time - (time.time() - start_time)
         if remaining <= 0:
             break
-
         # Local improvement with 2-opt → worst-case O(n^3)
         tour = two_opt(tour, dist, runtime_limit=remaining, start_time=start_time)
-
         # Compute cost of this tour → O(n)
         cost = tour_cost(tour, dist)
         per_run_costs.append(cost)

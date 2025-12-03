@@ -141,7 +141,7 @@ def two_opt(tour, dist, runtime_limit=None, start_time=None):
             for j in range(i + 1, n - 1):
                 if runtime_limit and time.time() - start_time > runtime_limit:
                     return tour
-
+            # does it start random?
                 c = tour[j]
                 d = tour[(j + 1) % n]
 

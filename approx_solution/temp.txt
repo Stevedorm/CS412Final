@@ -1,0 +1,36 @@
+APPROX_TSP(dist, total_time):
+
+    start_time ← now
+    best_cost  ← +∞
+    best_tour  ← None
+
+    per_run_costs ← []        # NEW: store cost of each restart
+    history       ← []        # NEW: (time, best_cost_so_far)
+
+    while (now - start_time) < total_time:
+
+        # NEW: randomize starting point to escape local minima
+        start ← random city
+        tour  ← GREEDY_TOUR(dist, start)
+
+        # Improve tour using 2-opt until no better move or time runs out
+        tour  ← TWO_OPT(tour, dist, time_limit = total_time)
+
+        cost ← TOUR_COST(tour)
+        per_run_costs.append(cost)
+
+        if cost < best_cost:
+            best_cost ← cost
+            best_tour ← tour
+
+        history.append( (now - start_time, best_cost) )
+
+    return best_tour, best_cost, per_run_costs, history
+
+
+
+
+
+
+
+

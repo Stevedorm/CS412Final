@@ -70,7 +70,7 @@ def main():
     best_cost = float('inf')
     best_tour = None
 
-    for _ in range(K):
+    for _ in range(K): 
         tour, cost = stochastic_greedy_tsp(dist)
         if cost < best_cost:
             best_cost = cost
@@ -109,11 +109,10 @@ def read_graph_from_stdin():
     return V, E, edges, nodes
 
 
-
-def stochastic_greedy_tsp(dist):
     """
     Single stochastic greedy TSP run.
     """
+def stochastic_greedy_tsp(dist):
     n = len(dist)
     visited = [False] * n
 
@@ -123,25 +122,24 @@ def stochastic_greedy_tsp(dist):
     visited[start] = True
     cost = 0.0
 
-    for _ in range(n - 1):
+    for _ in range(n - 1): #O(n) iterations
         candidates = []
         weights = []
 
-        for v in range(n):
+        for v in range(n): #O(n)
             if not visited[v]:
                 d = dist[current][v]
                 w = 1.0 / (d + 1e-12)
                 candidates.append(v)
                 weights.append(w)
 
-        next_city = weighted_random_choice(candidates, weights)
+        next_city = weighted_random_choice(candidates, weights) # O(n)
 
         visited[next_city] = True
         tour.append(next_city)
         cost += dist[current][next_city]
         current = next_city
-
-    # Close cycle
+        # Total: O(n) + O(n) = O(n) per iteration → O(n^2) total
     cost += dist[current][start]
 
     return tour, cost
